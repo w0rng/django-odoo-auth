@@ -8,7 +8,10 @@ from . import settings
 
 class OdooBackend(BaseBackend):
     def __init__(self):
-        url_login = f'{settings.ODOO_SERVER_URL}:{settings.ODOO_SERVER_PORT}/xmlrpc/2/common'
+        url = settings.ODOO_SERVER_URL
+        if settings.ODOO_SERVER_PORT is None:
+            url += f':{settings.ODOO_SERVER_PORT}'
+        url_login = f'{url}/xmlrpc/2/common'
         self.ODOO_SOCK_COMMON = xmlrpc.client.ServerProxy(url_login)
 
     def authenticate(self, request, username=None, password=None):
