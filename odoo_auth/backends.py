@@ -1,4 +1,4 @@
-import xmlrpc.client
+from xmlrpc.client import ServerProxy as XmlrpcServerProxy
 
 from django.contrib.auth.backends import BaseBackend
 
@@ -12,7 +12,7 @@ class OdooBackend(BaseBackend):
         if settings.ODOO_SERVER_PORT is None:
             url += f':{settings.ODOO_SERVER_PORT}'
         url_login = f'{url}/xmlrpc/2/common'
-        self.ODOO_SOCK_COMMON = xmlrpc.client.ServerProxy(url_login)
+        self.ODOO_SOCK_COMMON = XmlrpcServerProxy(url_login)
 
     def authenticate(self, request, username=None, password=None):
         user_uid = self.ODOO_SOCK_COMMON.authenticate(
