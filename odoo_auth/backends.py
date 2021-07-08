@@ -29,6 +29,7 @@ class OdooBackend(BaseBackend):
         user, created = User.objects.get_or_create(username=username)
         if created:
             user.set_password(password)
+            user.save()
             return user
         if user.check_password(password):
             return user
