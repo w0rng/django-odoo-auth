@@ -10,7 +10,7 @@ with open(path.join(this_directory, 'README.md'), encoding='utf-8') as f:
 
 setup(
     name='django-odoo-auth',
-    version='1.0.1.1',
+    version='1.0.2',
     packages=['odoo_auth'],
     license='Apache-2.0 License',
     description='Custom django auth backend for authorization via odoo',
