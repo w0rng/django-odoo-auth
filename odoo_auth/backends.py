@@ -1,12 +1,9 @@
 import xmlrpc.client
 
-from django.contrib.auth import get_user_model
 from django.contrib.auth.backends import BaseBackend
 
 from . import settings
-
-
-User = get_user_model()
+from .models import OdooUser, User
 
 
 class OdooBackend(BaseBackend):
@@ -26,13 +23,16 @@ class OdooBackend(BaseBackend):
         )
         if user_uid is None:
             return None
-        user, created = User.objects.get_or_create(username=username)
+        odoo_user, created = OdooUser.objects.get_or_create(odoo_id=user_uid)
         if created:
+            user = User.objects.create(username=username)
             user.set_password(password)
             user.save()
+            odoo_user.user = user
+            odoo_user.save()
             return user
-        if user.check_password(password):
-            return user
+        if odoo_user.user.check_password(password):
+            return odoo_user.user
         return None
 
     def get_user(self, user_id):
