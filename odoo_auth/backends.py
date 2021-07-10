@@ -37,6 +37,6 @@ class OdooBackend(BaseBackend):
 
     def get_user(self, user_id):
         try:
-            return User.objects.get(pk=user_id)
+            return OdooUser.objects.get(user__pk=user_id).user
         except User.DoesNotExist:
             return None
