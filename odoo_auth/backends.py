@@ -9,7 +9,7 @@ from .models import OdooUser, User
 class OdooBackend(BaseBackend):
     def __init__(self):
         url = settings.ODOO_SERVER_URL
-        if settings.ODOO_SERVER_PORT is None:
+        if settings.ODOO_SERVER_PORT is not None:
             url += f':{settings.ODOO_SERVER_PORT}'
         url_login = f'{url}/xmlrpc/2/common'
         self.ODOO_SOCK_COMMON = XmlrpcServerProxy(url_login)
