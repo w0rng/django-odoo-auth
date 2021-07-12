@@ -15,6 +15,10 @@ class OdooBackend(BaseBackend):
         self.ODOO_SOCK_COMMON = XmlrpcServerProxy(url_login)
 
     def authenticate(self, request, username=None, password=None):
+        user = User.objects.filter(username=username).first()
+        if user:
+            return user if user.check_password(password) else None
+
         user_uid = self.ODOO_SOCK_COMMON.authenticate(
             settings.ODOO_SERVER_DBNAME,
             username,
@@ -23,20 +27,15 @@ class OdooBackend(BaseBackend):
         )
         if user_uid is None:
             return None
-        odoo_user, created = OdooUser.objects.get_or_create(odoo_id=user_uid)
-        if created:
-            user = User.objects.create(username=username)
-            user.set_password(password)
-            user.save()
-            odoo_user.user = user
-            odoo_user.save()
-            return user
-        if odoo_user.user.check_password(password):
-            return odoo_user.user
-        return None
+
+        user.set_password(password)
+        user.save()
+
+        OdooUser.objects.create(odoo_id=user_uid, user=user)
+        return user
 
     def get_user(self, user_id):
         try:
-            return OdooUser.objects.get(user__pk=user_id).user
+            return User.objects.get(pk=user_id)
         except User.DoesNotExist:
             return None
