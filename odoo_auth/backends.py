@@ -15,8 +15,8 @@ class OdooBackend(BaseBackend):
         self.ODOO_SOCK_COMMON = XmlrpcServerProxy(url_login)
 
     def authenticate(self, request, username=None, password=None):
-        user, created = User.objects.get_or_create(username=username)
-        if not created:
+        user = User.objects.filter(username=username).first()
+        if user:
             return user if user.check_password(password) else None
 
         user_uid = self.ODOO_SOCK_COMMON.authenticate(
@@ -27,9 +27,9 @@ class OdooBackend(BaseBackend):
         )
 
         if not str(user_uid).isdigit():
-            user.delete()
             return None
 
+        user = User.objects.create(username=username)
         user.set_password(password)
         user.save()
 
